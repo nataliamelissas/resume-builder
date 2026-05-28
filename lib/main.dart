@@ -32,6 +32,15 @@ class ResumeBuilderApp extends StatelessWidget {
             foregroundColor: Colors.white,
             iconTheme: IconThemeData(color: Colors.white),
             actionsIconTheme: IconThemeData(color: Colors.white),
+            titleTextStyle: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+            // Kill M3's surface-tint overlay and scroll-under recolor so the
+            // bar stays the exact slate we set above.
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
             elevation: 0,
           ),
         ),
