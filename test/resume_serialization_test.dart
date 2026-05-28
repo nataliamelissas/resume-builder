@@ -44,7 +44,10 @@ void main() {
             bullets: ['Bernoulli numbers algorithm'],
           ),
         ],
-        skills: ['Mathematics', 'Logic', 'Translation'],
+        skills: [
+          SkillGroup(name: 'Math', items: ['Algebra', 'Logic']),
+          SkillGroup(name: 'Languages', items: ['English', 'French']),
+        ],
       );
 
       final decoded = Resume.decode(r.encode());
@@ -55,7 +58,18 @@ void main() {
       expect(decoded.experience.single.bullets, r.experience.single.bullets);
       expect(decoded.education.single.school, r.education.single.school);
       expect(decoded.projects.single.name, r.projects.single.name);
-      expect(decoded.skills, r.skills);
+      expect(decoded.skills.length, 2);
+      expect(decoded.skills.first.name, 'Math');
+      expect(decoded.skills.first.items, ['Algebra', 'Logic']);
+    });
+
+    test('migrates legacy flat-list skills into a single un-named group', () {
+      // Old persisted shape: skills as a flat list of strings.
+      const legacy = '{"skills":["Dart","Flutter","AWS"]}';
+      final r = Resume.decode(legacy);
+      expect(r.skills, hasLength(1));
+      expect(r.skills.single.name, '');
+      expect(r.skills.single.items, ['Dart', 'Flutter', 'AWS']);
     });
 
     test('decodes an empty object to defaults', () {

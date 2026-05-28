@@ -20,7 +20,7 @@ class Resume {
   final List<EducationItem> education;
   final List<ExperienceItem> experience;
   final List<ProjectItem> projects;
-  final List<String> skills;
+  final List<SkillGroup> skills;
 
   Resume copyWith({
     Bio? bio,
@@ -28,7 +28,7 @@ class Resume {
     List<EducationItem>? education,
     List<ExperienceItem>? experience,
     List<ProjectItem>? projects,
-    List<String>? skills,
+    List<SkillGroup>? skills,
   }) =>
       Resume(
         bio: bio ?? this.bio,
@@ -60,12 +60,40 @@ class Resume {
         projects: _asList(json['projects'])
             .map((e) => ProjectItem.fromJson(_asMap(e)))
             .toList(),
-        skills: _asList(json['skills']).cast<String>(),
+        skills: _parseSkills(json['skills']),
       );
 
   String encode() => jsonEncode(toJson());
   static Resume decode(String src) =>
       Resume.fromJson(jsonDecode(src) as Map<String, dynamic>);
+}
+
+/// Back-compat: previously `skills` was `List<String>` (a flat list). Detect
+/// that shape and migrate it into a single un-named [SkillGroup].
+List<SkillGroup> _parseSkills(Object? raw) {
+  final list = _asList(raw);
+  if (list.isEmpty) return const [];
+  if (list.first is String) {
+    return [SkillGroup(items: list.cast<String>())];
+  }
+  return list.map((e) => SkillGroup.fromJson(_asMap(e))).toList();
+}
+
+/// A named bucket of skills. PDF renders as `Name: item1, item2, ...`.
+class SkillGroup {
+  const SkillGroup({this.name = '', this.items = const []});
+  final String name;
+  final List<String> items;
+
+  SkillGroup copyWith({String? name, List<String>? items}) =>
+      SkillGroup(name: name ?? this.name, items: items ?? this.items);
+
+  Map<String, dynamic> toJson() => {'name': name, 'items': items};
+
+  factory SkillGroup.fromJson(Map<String, dynamic> json) => SkillGroup(
+        name: (json['name'] as String?) ?? '',
+        items: _asList(json['items']).cast<String>(),
+      );
 }
 
 /// Contact header. Email/phone/links are rendered as selectable, clickable

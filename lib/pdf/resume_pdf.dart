@@ -109,9 +109,33 @@ pw.Widget? _renderSection(Section section, Resume r, double size) {
         r.projects.map((p) => _project(p, size)).toList(),
       );
     case Section.skills:
-      if (r.skills.isEmpty) return null;
-      return _section('Skills', size, [pw.Text(r.skills.join(', '))]);
+      final groups =
+          r.skills.where((g) => g.items.isNotEmpty).toList();
+      if (groups.isEmpty) return null;
+      return _section(
+        'Skills',
+        size,
+        groups.map((g) => _skillGroup(g)).toList(),
+      );
   }
+}
+
+/// `Category: item1, item2, item3` with the category bolded. Renders as one
+/// text block so wrapping is natural and ATS sees a single line per group.
+pw.Widget _skillGroup(SkillGroup g) {
+  final items = g.items.join(', ');
+  if (g.name.isEmpty) return pw.Text(items);
+  return pw.RichText(
+    text: pw.TextSpan(
+      children: [
+        pw.TextSpan(
+          text: '${g.name}: ',
+          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+        ),
+        pw.TextSpan(text: items),
+      ],
+    ),
+  );
 }
 
 pw.Widget _bioHeader(Bio b, double size) {

@@ -33,7 +33,7 @@ void main() {
           bullets: ['Shipped X', 'Improved Y'],
         ),
       ],
-      skills: ['Dart', 'Flutter'],
+      skills: [SkillGroup(name: 'Languages', items: ['Dart', 'Flutter'])],
     );
     final doc = buildResumePdf(r, const Settings());
     await doc.save();
