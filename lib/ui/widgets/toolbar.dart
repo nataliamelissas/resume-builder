@@ -53,7 +53,9 @@ class EditorToolbar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.file_download),
           onPressed: () => exportJson(store.resume, store.settings),
         ),
-        TextButton.icon(
+        Tooltip(
+          message: 'Export PDF',
+          child: TextButton.icon(
           icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
           label: const Text('PDF', style: TextStyle(color: Colors.white)),
           onPressed: () async {
@@ -63,6 +65,7 @@ class EditorToolbar extends StatelessWidget implements PreferredSizeWidget {
                 : store.resume.bio.name.trim().replaceAll(RegExp(r'\s+'), '_');
             downloadBytes(bytes, '$name.pdf', 'application/pdf');
           },
+        ),
         ),
         const SizedBox(width: 8),
       ],
@@ -105,17 +108,32 @@ class _FontDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const fonts = [ResumeFont.helvetica, ResumeFont.times, ResumeFont.courier];
+    const labels = ['Helvetica', 'Times', 'Courier'];
     return DropdownButton<ResumeFont>(
       value: value,
       dropdownColor: Theme.of(context).colorScheme.surface,
       underline: const SizedBox.shrink(),
-      style: const TextStyle(color: Colors.white),
       iconEnabledColor: Colors.white,
-      items: const [
-        DropdownMenuItem(value: ResumeFont.helvetica, child: Text('Helvetica')),
-        DropdownMenuItem(value: ResumeFont.times, child: Text('Times')),
-        DropdownMenuItem(value: ResumeFont.courier, child: Text('Courier')),
-      ],
+      // selectedItemBuilder renders only the AppBar chip — white on dark.
+      selectedItemBuilder: (_) => fonts
+          .map(
+            (f) => Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                labels[fonts.indexOf(f)],
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          )
+          .toList(),
+      items: List.generate(
+        fonts.length,
+        (i) => DropdownMenuItem(
+          value: fonts[i],
+          child: Text(labels[i]),
+        ),
+      ),
       onChanged: (v) {
         if (v != null) onChanged(v);
       },
