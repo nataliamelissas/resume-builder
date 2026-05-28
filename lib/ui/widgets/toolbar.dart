@@ -158,6 +158,7 @@ class _MarginToggle extends StatelessWidget {
     return SegmentedButton<Margin>(
       style: SegmentedButton.styleFrom(foregroundColor: Colors.white),
       segments: const [
+        ButtonSegment(value: Margin.half, label: Text('0.5"')),
         ButtonSegment(value: Margin.quarter, label: Text('0.25"')),
         ButtonSegment(value: Margin.eighth, label: Text('0.125"')),
       ],

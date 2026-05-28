@@ -12,6 +12,7 @@ enum ResumeFont { helvetica, times, courier }
 
 /// Page margin in inches. ATS-safe values only.
 enum Margin {
+  half(0.5),
   quarter(0.25),
   eighth(0.125);
 
