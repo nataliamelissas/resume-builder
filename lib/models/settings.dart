@@ -8,7 +8,7 @@ enum Section { summary, education, experience, projects, skills }
 
 /// Standard PDF-14 fonts. Picked from this fixed set so ATS parsers never
 /// have to deal with an embedded font subset.
-enum PdfFont { helvetica, times, courier }
+enum ResumeFont { helvetica, times, courier }
 
 /// Page margin in inches. ATS-safe values only.
 enum Margin {
@@ -28,13 +28,13 @@ class Settings {
       Section.projects,
       Section.skills,
     },
-    this.font = PdfFont.helvetica,
+    this.font = ResumeFont.helvetica,
     this.fontSize = 10,
     this.margin = Margin.quarter,
   });
 
   final Set<Section> enabled;
-  final PdfFont font;
+  final ResumeFont font;
   final int fontSize;
   final Margin margin;
 
@@ -42,7 +42,7 @@ class Settings {
 
   Settings copyWith({
     Set<Section>? enabled,
-    PdfFont? font,
+    ResumeFont? font,
     int? fontSize,
     Margin? margin,
   }) =>
@@ -74,9 +74,9 @@ class Settings {
           .map((n) => Section.values.where((s) => s.name == n).firstOrNull)
           .whereType<Section>()
           .toSet(),
-      font: PdfFont.values.firstWhere(
+      font: ResumeFont.values.firstWhere(
         (e) => e.name == json['font'],
-        orElse: () => PdfFont.helvetica,
+        orElse: () => ResumeFont.helvetica,
       ),
       fontSize: (json['fontSize'] as int?) ?? 10,
       margin: Margin.values.firstWhere(

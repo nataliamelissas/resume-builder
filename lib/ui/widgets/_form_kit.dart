@@ -24,7 +24,7 @@ class FormCard extends StatelessWidget {
               children: [
                 Text(title, style: Theme.of(context).textTheme.titleMedium),
                 const Spacer(),
-                if (trailing != null) trailing!,
+                ?trailing,
               ],
             ),
             const SizedBox(height: 8),

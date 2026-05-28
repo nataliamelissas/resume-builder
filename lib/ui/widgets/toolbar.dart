@@ -100,21 +100,21 @@ class _OverflowBadge extends StatelessWidget {
 
 class _FontDropdown extends StatelessWidget {
   const _FontDropdown({required this.value, required this.onChanged});
-  final PdfFont value;
-  final ValueChanged<PdfFont> onChanged;
+  final ResumeFont value;
+  final ValueChanged<ResumeFont> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<PdfFont>(
+    return DropdownButton<ResumeFont>(
       value: value,
       dropdownColor: Theme.of(context).colorScheme.surface,
       underline: const SizedBox.shrink(),
       style: const TextStyle(color: Colors.white),
       iconEnabledColor: Colors.white,
       items: const [
-        DropdownMenuItem(value: PdfFont.helvetica, child: Text('Helvetica')),
-        DropdownMenuItem(value: PdfFont.times, child: Text('Times')),
-        DropdownMenuItem(value: PdfFont.courier, child: Text('Courier')),
+        DropdownMenuItem(value: ResumeFont.helvetica, child: Text('Helvetica')),
+        DropdownMenuItem(value: ResumeFont.times, child: Text('Times')),
+        DropdownMenuItem(value: ResumeFont.courier, child: Text('Courier')),
       ],
       onChanged: (v) {
         if (v != null) onChanged(v);

@@ -33,13 +33,12 @@ pw.Document buildResumePdf(Resume r, Settings s) {
     theme: theme,
   );
 
+  // MultiPage so content that overflows produces extra pages; the caller
+  // detects pages > 1 and warns the user.
   doc.addPage(
-    pw.Page(
+    pw.MultiPage(
       pageFormat: pageFormat,
-      build: (ctx) => pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: _body(r, s),
-      ),
+      build: (ctx) => _body(r, s),
     ),
   );
 
@@ -51,19 +50,19 @@ pw.Document buildResumePdf(Resume r, Settings s) {
 pw.ThemeData _theme(Settings s) {
   final size = s.fontSize.toDouble();
   final base = switch (s.font) {
-    PdfFont.helvetica => pw.Font.helvetica(),
-    PdfFont.times => pw.Font.times(),
-    PdfFont.courier => pw.Font.courier(),
+    ResumeFont.helvetica => pw.Font.helvetica(),
+    ResumeFont.times => pw.Font.times(),
+    ResumeFont.courier => pw.Font.courier(),
   };
   final bold = switch (s.font) {
-    PdfFont.helvetica => pw.Font.helveticaBold(),
-    PdfFont.times => pw.Font.timesBold(),
-    PdfFont.courier => pw.Font.courierBold(),
+    ResumeFont.helvetica => pw.Font.helveticaBold(),
+    ResumeFont.times => pw.Font.timesBold(),
+    ResumeFont.courier => pw.Font.courierBold(),
   };
   final italic = switch (s.font) {
-    PdfFont.helvetica => pw.Font.helveticaOblique(),
-    PdfFont.times => pw.Font.timesItalic(),
-    PdfFont.courier => pw.Font.courierOblique(),
+    ResumeFont.helvetica => pw.Font.helveticaOblique(),
+    ResumeFont.times => pw.Font.timesItalic(),
+    ResumeFont.courier => pw.Font.courierOblique(),
   };
   return pw.ThemeData.withFont(base: base, bold: bold, italic: italic).copyWith(
     defaultTextStyle: pw.TextStyle(font: base, fontSize: size),
@@ -106,7 +105,7 @@ List<pw.Widget> _body(Resume r, Settings s) {
   }
   if (s.isOn(Section.skills) && r.skills.isNotEmpty) {
     out.add(
-      _section('Skills', size, [pw.Text(r.skills.join(' • '))]),
+      _section('Skills', size, [pw.Text(r.skills.join(', '))]),
     );
   }
   return out;
@@ -184,8 +183,8 @@ pw.Widget _section(String title, double size, List<pw.Widget> children) {
 
 pw.Widget _experience(ExperienceItem e, double size) {
   final dates = _dates(e.start, e.end);
-  final headline = [e.title, e.company].where((s) => s.isNotEmpty).join(' — ');
-  final meta = [e.location, dates].where((s) => s.isNotEmpty).join(' · ');
+  final headline = [e.title, e.company].where((s) => s.isNotEmpty).join(' - ');
+  final meta = [e.location, dates].where((s) => s.isNotEmpty).join(' | ');
   return pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     children: [
@@ -203,8 +202,8 @@ pw.Widget _experience(ExperienceItem e, double size) {
 
 pw.Widget _education(EducationItem e, double size) {
   final dates = _dates(e.start, e.end);
-  final headline = [e.degree, e.school].where((s) => s.isNotEmpty).join(' — ');
-  final meta = [e.location, dates].where((s) => s.isNotEmpty).join(' · ');
+  final headline = [e.degree, e.school].where((s) => s.isNotEmpty).join(' - ');
+  final meta = [e.location, dates].where((s) => s.isNotEmpty).join(' | ');
   return pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     children: [
@@ -247,14 +246,15 @@ List<pw.Widget> _bullets(List<String> items) => [
         if (b.trim().isNotEmpty)
           pw.Padding(
             padding: const pw.EdgeInsets.only(left: 8, top: 1),
-            // Literal "• " keeps the bullet in the extracted text stream.
-            child: pw.Text('• ${b.trim()}'),
+            // ASCII "- " keeps bullets in the extracted text stream and
+            // avoids fonts that don't carry U+2022.
+            child: pw.Text('- ${b.trim()}'),
           ),
     ];
 
 String _dates(String start, String end) {
   if (start.isEmpty && end.isEmpty) return '';
   if (start.isEmpty) return end;
-  if (end.isEmpty) return '$start – Present';
-  return '$start – $end';
+  if (end.isEmpty) return '$start - Present';
+  return '$start - $end';
 }
