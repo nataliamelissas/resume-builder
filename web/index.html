@@ -24,18 +24,23 @@
     Content Security Policy. Restrictive enough to block third-party
     exfiltration; permissive enough for Flutter web's CanvasKit assets from
     gstatic. Resume data never leaves the browser.
+    Note: 'unsafe-eval' is only required by Flutter's Dart Dev Compiler in
+    `flutter run`. Strip it for production — dart2js (`flutter build web
+    --release`) doesn't eval strings.
   -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'wasm-unsafe-eval' https://www.gstatic.com;
+    script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' 'sha256-MndvH2xoJITJx1vAmJTo0n71uGBofeMZfQTpl28Jz7s=' https://www.gstatic.com;
     style-src 'self' 'unsafe-inline';
     img-src 'self' data: blob:;
-    font-src 'self' data:;
-    connect-src 'self' https://www.gstatic.com data: blob:;
+    font-src 'self' data: https://fonts.gstatic.com;
+    connect-src 'self' https://www.gstatic.com https://fonts.gstatic.com data: blob:;
+    worker-src 'self' blob:;
     object-src 'none';
     base-uri 'self';
-    frame-ancestors 'none';
   ">
+  <!-- frame-ancestors must be sent as an HTTP header (browsers ignore it in <meta>);
+       set `Content-Security-Policy: frame-ancestors 'none'` at the hosting layer. -->
 
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -55,6 +60,10 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
+  <!-- Self-hosted PDF.js for the resume preview. Loaded before Flutter so the
+       `printing` package finds window.pdfjsLib and skips its CDN fetch. -->
+  <script src="pdfjs/pdf-3.2.146.min.js"></script>
+  <script src="pdfjs/init.js"></script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
