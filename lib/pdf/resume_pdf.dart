@@ -73,42 +73,45 @@ List<pw.Widget> _body(Resume r, Settings s) {
   final size = s.fontSize.toDouble();
   final out = <pw.Widget>[_bioHeader(r.bio, size)];
 
-  if (s.isOn(Section.summary) && r.summary.trim().isNotEmpty) {
-    out.add(_section('Summary', size, [pw.Text(r.summary.trim())]));
+  // Iterate the user-defined order; skip disabled or empty sections.
+  for (final section in s.order) {
+    if (!s.isOn(section)) continue;
+    final w = _renderSection(section, r, size);
+    if (w != null) out.add(w);
   }
-  if (s.isOn(Section.experience) && r.experience.isNotEmpty) {
-    out.add(
-      _section(
+  return out;
+}
+
+pw.Widget? _renderSection(Section section, Resume r, double size) {
+  switch (section) {
+    case Section.summary:
+      if (r.summary.trim().isEmpty) return null;
+      return _section('Summary', size, [pw.Text(r.summary.trim())]);
+    case Section.experience:
+      if (r.experience.isEmpty) return null;
+      return _section(
         'Experience',
         size,
         r.experience.map((e) => _experience(e, size)).toList(),
-      ),
-    );
-  }
-  if (s.isOn(Section.education) && r.education.isNotEmpty) {
-    out.add(
-      _section(
+      );
+    case Section.education:
+      if (r.education.isEmpty) return null;
+      return _section(
         'Education',
         size,
         r.education.map((e) => _education(e, size)).toList(),
-      ),
-    );
-  }
-  if (s.isOn(Section.projects) && r.projects.isNotEmpty) {
-    out.add(
-      _section(
+      );
+    case Section.projects:
+      if (r.projects.isEmpty) return null;
+      return _section(
         'Projects',
         size,
         r.projects.map((p) => _project(p, size)).toList(),
-      ),
-    );
+      );
+    case Section.skills:
+      if (r.skills.isEmpty) return null;
+      return _section('Skills', size, [pw.Text(r.skills.join(', '))]);
   }
-  if (s.isOn(Section.skills) && r.skills.isNotEmpty) {
-    out.add(
-      _section('Skills', size, [pw.Text(r.skills.join(', '))]),
-    );
-  }
-  return out;
 }
 
 pw.Widget _bioHeader(Bio b, double size) {
@@ -123,7 +126,6 @@ pw.Widget _bioHeader(Bio b, double size) {
     alignment: pw.Alignment.center,
     child: pw.Column(
       mainAxisSize: pw.MainAxisSize.min,
-      crossAxisAlignment: pw.CrossAxisAlignment.center,
       children: [
         if (b.name.isNotEmpty)
           pw.Text(
