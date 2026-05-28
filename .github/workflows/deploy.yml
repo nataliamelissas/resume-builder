@@ -1,0 +1,57 @@
+# Build the Flutter web release bundle and publish it to GitHub Pages.
+# GitHub Pages auto-gzips text assets and serves `Cache-Control: max-age=600`;
+# we can't tighten that here. We rely on (a) Flutter content-hashing its own
+# JS, (b) version-pinned PDF.js filenames, and (c) ETag revalidation for
+# returning visitors.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Cancel in-flight runs when a new push lands so we don't deploy stale builds.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.6
+
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+      # `--base-href` must match the repo subpath the site is served from.
+      # Project Pages live at https://<user>.github.io/<repo>/ so we use /resume-builder/.
+      - name: Build web
+        run: flutter build web --release --base-href "/resume-builder/"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

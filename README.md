@@ -36,9 +36,31 @@ flutter analyze       # static analysis, must be clean
 ## Build
 
 ```bash
-flutter build web --release
+flutter build web --release --base-href "/resume-builder/"
 # output: build/web/  -> deploy as static assets
 ```
+
+## Deploy (GitHub Pages)
+
+A GitHub Actions workflow (`.github/workflows/deploy.yml`) auto-builds and
+publishes `main` to GitHub Pages on every push. One-time setup:
+
+1. Repo settings → **Pages** → **Source: GitHub Actions**.
+2. Push to `main`. The site lands at `https://<user>.github.io/resume-builder/`.
+
+### Caching & compression on GitHub Pages
+
+GitHub Pages handles these for you, with limits worth knowing:
+
+| Concern | What Pages does | Notes |
+|---|---|---|
+| gzip compression | Automatic for text assets | No brotli. Not configurable. |
+| `Cache-Control` | Fixed at `max-age=600` (10 min) | Not configurable. ETags work, so repeat loads get 304s. |
+| Cache-busting | Flutter content-hashes its own JS; PDF.js is version-pinned (`pdf-3.2.146.min.js`) | Bumping PDF.js means changing the filename. |
+
+If you ever need true long-term `Cache-Control: public, max-age=31536000,
+immutable` on hashed assets, move to Cloudflare Pages or Netlify — both
+honor a top-level `_headers` file.
 
 ## Verify ATS-extractability (optional, requires Python)
 
