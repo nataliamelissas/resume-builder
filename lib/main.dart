@@ -25,6 +25,15 @@ class ResumeBuilderApp extends StatelessWidget {
           colorSchemeSeed: const Color(0xFF1F2937),
           useMaterial3: true,
           brightness: Brightness.light,
+          // M3 defaults the AppBar to a light surface, which hides white
+          // text/icons. Force a dark bar so the toolbar reads cleanly.
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF1F2937),
+            foregroundColor: Colors.white,
+            iconTheme: IconThemeData(color: Colors.white),
+            actionsIconTheme: IconThemeData(color: Colors.white),
+            elevation: 0,
+          ),
         ),
         home: const EditorPage(),
       ),
