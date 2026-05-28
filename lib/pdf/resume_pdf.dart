@@ -116,16 +116,19 @@ pw.Widget _bioHeader(Bio b, double size) {
     if (b.location.isNotEmpty) b.location,
     if (b.phone.isNotEmpty) b.phone,
   ];
-  // Full-width container so the inner Column's crossAxisAlignment.center
-  // actually centers across the page rather than wrapping to content width.
-  return pw.SizedBox(
+  // pw.Container with full width + center alignment guarantees the inner
+  // column spans the page and its children center horizontally.
+  return pw.Container(
     width: double.infinity,
+    alignment: pw.Alignment.center,
     child: pw.Column(
+      mainAxisSize: pw.MainAxisSize.min,
       crossAxisAlignment: pw.CrossAxisAlignment.center,
       children: [
         if (b.name.isNotEmpty)
           pw.Text(
             b.name,
+            textAlign: pw.TextAlign.center,
             style: pw.TextStyle(
               fontSize: size + 6,
               fontWeight: pw.FontWeight.bold,
@@ -134,7 +137,11 @@ pw.Widget _bioHeader(Bio b, double size) {
         if (b.headline.isNotEmpty)
           pw.Padding(
             padding: const pw.EdgeInsets.only(top: 2),
-            child: pw.Text(b.headline, style: pw.TextStyle(fontSize: size)),
+            child: pw.Text(
+              b.headline,
+              textAlign: pw.TextAlign.center,
+              style: pw.TextStyle(fontSize: size),
+            ),
           ),
         pw.SizedBox(height: 2),
         pw.Wrap(
