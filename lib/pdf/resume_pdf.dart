@@ -116,43 +116,49 @@ pw.Widget _bioHeader(Bio b, double size) {
     if (b.location.isNotEmpty) b.location,
     if (b.phone.isNotEmpty) b.phone,
   ];
-  return pw.Column(
-    crossAxisAlignment: pw.CrossAxisAlignment.start,
-    children: [
-      if (b.name.isNotEmpty)
-        pw.Text(
-          b.name,
-          style: pw.TextStyle(
-            fontSize: size + 6,
-            fontWeight: pw.FontWeight.bold,
-          ),
-        ),
-      if (b.headline.isNotEmpty)
-        pw.Padding(
-          padding: const pw.EdgeInsets.only(top: 2),
-          child: pw.Text(b.headline, style: pw.TextStyle(fontSize: size)),
-        ),
-      pw.SizedBox(height: 2),
-      pw.Wrap(
-        spacing: 8,
-        runSpacing: 2,
-        children: [
-          for (final bit in contactBits) pw.Text(bit),
-          if (b.email.isNotEmpty)
-            pw.UrlLink(
-              destination: 'mailto:${b.email}',
-              child: pw.Text(b.email),
+  // Full-width container so the inner Column's crossAxisAlignment.center
+  // actually centers across the page rather than wrapping to content width.
+  return pw.SizedBox(
+    width: double.infinity,
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.center,
+      children: [
+        if (b.name.isNotEmpty)
+          pw.Text(
+            b.name,
+            style: pw.TextStyle(
+              fontSize: size + 6,
+              fontWeight: pw.FontWeight.bold,
             ),
-          for (final link in b.links)
-            if (link.url.isNotEmpty)
+          ),
+        if (b.headline.isNotEmpty)
+          pw.Padding(
+            padding: const pw.EdgeInsets.only(top: 2),
+            child: pw.Text(b.headline, style: pw.TextStyle(fontSize: size)),
+          ),
+        pw.SizedBox(height: 2),
+        pw.Wrap(
+          alignment: pw.WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 2,
+          children: [
+            for (final bit in contactBits) pw.Text(bit),
+            if (b.email.isNotEmpty)
               pw.UrlLink(
-                destination: link.url,
-                child:
-                    pw.Text(link.label.isEmpty ? link.url : link.label),
+                destination: 'mailto:${b.email}',
+                child: pw.Text(b.email),
               ),
-        ],
-      ),
-    ],
+            for (final link in b.links)
+              if (link.url.isNotEmpty)
+                pw.UrlLink(
+                  destination: link.url,
+                  child:
+                      pw.Text(link.label.isEmpty ? link.url : link.label),
+                ),
+          ],
+        ),
+      ],
+    ),
   );
 }
 
